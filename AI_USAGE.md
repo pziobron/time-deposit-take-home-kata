@@ -55,6 +55,11 @@ mvn test
 - Explanation and review of binary floating-point rounding, including why changing
   the monetary arithmetic could violate the requirement to preserve behavior.
 - Drafting of this documentation.
+- Addition of Lombok at the candidate's request: `@RequiredArgsConstructor` replaces
+  explicit constructors in the controller, application service, and persistence
+  adapter. Records and the shared model remain unchanged. The Spring Boot parent
+  manages the Lombok version; Maven explicitly configures annotation processing
+  and excludes Lombok from the executable JAR.
 - PostgreSQL persistence and production wiring: Spring Data JDBC repositories,
   separate mapped entity records, Flyway migration, balance-only writes, and a
   narrow calculation-input read. Ordered row locks protect concurrent updates.

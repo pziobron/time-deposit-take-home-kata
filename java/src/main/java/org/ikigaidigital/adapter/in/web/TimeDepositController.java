@@ -1,5 +1,7 @@
 package org.ikigaidigital.adapter.in.web;
 
+import lombok.RequiredArgsConstructor;
+
 import org.ikigaidigital.application.model.TimeDepositDetails;
 import org.ikigaidigital.application.service.TimeDepositService;
 import org.springframework.http.HttpStatus;
@@ -15,12 +17,9 @@ import java.util.List;
 /** HTTP adapter for the two operations defined in the OpenAPI contract. */
 @RestController
 @RequestMapping("/time-deposits")
+@RequiredArgsConstructor
 public class TimeDepositController {
     private final TimeDepositService service;
-
-    public TimeDepositController(TimeDepositService service) {
-        this.service = service;
-    }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<TimeDepositDetails> getTimeDeposits() {

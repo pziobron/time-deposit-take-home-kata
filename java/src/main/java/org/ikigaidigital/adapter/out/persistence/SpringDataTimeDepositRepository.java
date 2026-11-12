@@ -1,5 +1,7 @@
 package org.ikigaidigital.adapter.out.persistence;
 
+import lombok.RequiredArgsConstructor;
+
 import org.ikigaidigital.application.model.BalanceUpdate;
 import org.ikigaidigital.application.model.InterestCalculationInput;
 import org.ikigaidigital.application.model.TimeDepositDetails;
@@ -14,15 +16,10 @@ import java.util.stream.Collectors;
 
 /** Implements the application port through Spring Data JDBC repositories. */
 @Repository
+@RequiredArgsConstructor
 public class SpringDataTimeDepositRepository implements TimeDepositRepository {
     private final TimeDepositJdbcRepository deposits;
     private final WithdrawalJdbcRepository withdrawals;
-
-    public SpringDataTimeDepositRepository(TimeDepositJdbcRepository deposits,
-                                            WithdrawalJdbcRepository withdrawals) {
-        this.deposits = deposits;
-        this.withdrawals = withdrawals;
-    }
 
     @Override
     public List<TimeDepositDetails> findAll() {

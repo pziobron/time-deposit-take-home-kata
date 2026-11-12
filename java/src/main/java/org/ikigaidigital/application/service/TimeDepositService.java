@@ -1,5 +1,7 @@
 package org.ikigaidigital.application.service;
 
+import lombok.RequiredArgsConstructor;
+
 import org.ikigaidigital.application.model.BalanceUpdate;
 import org.ikigaidigital.application.model.TimeDepositDetails;
 import org.ikigaidigital.TimeDeposit;
@@ -11,14 +13,10 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /** Coordinates deposit retrieval and interest updates independently of HTTP and storage technology. */
+@RequiredArgsConstructor
 public class TimeDepositService {
     private final TimeDepositRepository repository;
     private final TimeDepositCalculator calculator;
-
-    public TimeDepositService(TimeDepositRepository repository, TimeDepositCalculator calculator) {
-        this.repository = repository;
-        this.calculator = calculator;
-    }
 
     @Transactional(readOnly = true)
     public List<TimeDepositDetails> getTimeDeposits() {
