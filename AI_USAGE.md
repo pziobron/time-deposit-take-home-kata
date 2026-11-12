@@ -52,6 +52,15 @@ mvn test
 - Explanation and review of binary floating-point rounding, including why changing
   the monetary arithmetic could violate the requirement to preserve behavior.
 - Drafting of this documentation.
+- Test-first implementation of application use cases for retrieval and balance
+  updates, a repository port, and immutable deposit/withdrawal snapshots. Five
+  service tests use a test-only in-memory repository with explicit saving and the
+  real calculator, without mocking or adding framework dependencies.
+- Organization of application records under `application.model`, the service
+  under `application.service`, and the repository interface under `application.port`.
+- Refinement of balance persistence to accept only deposit IDs and decimal
+  balances through `BalanceUpdate`. The application service converts calculator
+  results using `BigDecimal.valueOf`, keeping that conversion out of adapters.
 - Definition of the two-operation OpenAPI contract and API assumptions before
   implementation, including response schemas, examples, update semantics, and
   withdrawal representation. Contract validation used
@@ -71,11 +80,17 @@ candidate reviewed the cases interactively, questioned expected values and
 redundancy, and discussed the behavior each test protects.
 
 The calculator now delegates interest calculation to plan-specific policies without
-intentional behavior changes for valid inputs. The latest test run passed all 37
-tests. A subsequent `mvn clean verify` run also passed all 37 tests and measured
+intentional behavior changes for valid inputs. Before the application layer was
+added, `mvn clean verify` passed all 37 calculator tests and measured
 100% line coverage (36/36) and branch coverage (12/12) for the current Java
 production code. Coverage confirms execution of branches, not correctness by
 itself; expected outcomes and boundary cases were reviewed separately.
+
+After application implementation, `mvn clean verify` passed all 42 tests (37
+calculator and five application tests). HTTP adapters, database persistence, and
+transaction integration are still to be implemented. The application service
+documents that its full read-calculate-save operation must run in one transaction
+when infrastructure is wired.
 
 To regenerate the coverage report from the repository root:
 
