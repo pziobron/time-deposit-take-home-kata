@@ -1,5 +1,6 @@
 package org.ikigaidigital;
 
+/** Represents a time deposit with its plan type, current balance, and age in days. */
 public class TimeDeposit {
     private int id;
     private String planType;

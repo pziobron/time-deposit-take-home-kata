@@ -52,11 +52,14 @@ mvn test
 - Explanation and review of binary floating-point rounding, including why changing
   the monetary arithmetic could violate the requirement to preserve behavior.
 - Drafting of this documentation.
+- Documentation of calculator assumptions in code comments: annual rates divided
+  by 12 and one update per invocation, without scheduling or advancing days.
 
 AI assistance supported test design and implementation before refactoring. The
 candidate reviewed the cases interactively, questioned expected values and
 redundancy, and discussed the behavior each test protects.
 
-At this stage, production code is unchanged. The latest test run passed all 37
+At this stage, production changes are limited to comments; calculator logic is
+unchanged. The latest test run passed all 37
 tests. No coverage measurement has been performed yet. This document should be
 updated as further development is completed.
