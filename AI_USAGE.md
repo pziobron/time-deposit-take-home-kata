@@ -52,6 +52,7 @@ mvn test
 - Explanation and review of binary floating-point rounding, including why changing
   the monetary arithmetic could violate the requirement to preserve behavior.
 - Drafting of this documentation.
+- Addition of JaCoCo reporting and review of line and branch coverage.
 - Documentation of calculator assumptions in code comments: annual rates divided
   by 12 and one update per invocation, without scheduling or advancing days.
 - Initial calculator refactoring: for-each iteration, extraction of interest
@@ -66,5 +67,18 @@ redundancy, and discussed the behavior each test protects.
 
 The calculator now delegates interest calculation to plan-specific policies without
 intentional behavior changes for valid inputs. The latest test run passed all 37
-tests. No coverage measurement has been performed yet. This document should be
-updated as further development is completed.
+tests. A subsequent `mvn clean verify` run also passed all 37 tests and measured
+100% line coverage (36/36) and branch coverage (12/12) for the current Java
+production code. Coverage confirms execution of branches, not correctness by
+itself; expected outcomes and boundary cases were reviewed separately.
+
+To regenerate the coverage report from the repository root:
+
+```sh
+cd java
+mvn clean verify
+```
+
+Open `java/target/site/jacoco/index.html` from the repository root to view the
+report. Generated reports remain under the ignored `target/` directory.
+This document should be updated as further development is completed.
