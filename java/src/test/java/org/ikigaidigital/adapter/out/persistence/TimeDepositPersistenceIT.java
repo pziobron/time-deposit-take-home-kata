@@ -14,6 +14,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -33,7 +36,8 @@ import static org.awaitility.Awaitility.await;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Testcontainers
-@SpringBootTest(classes = TimeDepositApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = TimeDepositApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = "SWAGGER_PORT=18081")
 class TimeDepositPersistenceIT {
     @Container
     static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17.6-alpine");
@@ -96,6 +100,20 @@ class TimeDepositPersistenceIT {
         assertThat(repository.findAll()).containsExactly(
             new TimeDepositDetails(first.id(), first.planType(), new BigDecimal("1201.123"),
                 first.days(), first.withdrawals()), before.get(1));
+    }
+
+    @Test
+    void allowsSwaggerPreflightFromTheConfiguredPort() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setOrigin("http://localhost:18081");
+        headers.setAccessControlRequestMethod(HttpMethod.POST);
+
+        var response = http.exchange("/time-deposits/update-balances", HttpMethod.OPTIONS,
+            new HttpEntity<>(headers), String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getAccessControlAllowOrigin()).isEqualTo("http://localhost:18081");
+        assertThat(response.getHeaders().getAccessControlAllowMethods()).contains(HttpMethod.POST);
     }
 
     @Test

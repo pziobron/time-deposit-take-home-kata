@@ -167,3 +167,15 @@ into `org.ikigaidigital.support.InMemoryTimeDepositRepository` under test source
 Both suites use its fixture setup/reset methods and immutable snapshots. It does
 not simulate locking or transactions; PostgreSQL Testcontainers tests retain that
 responsibility. No H2 dependency or production repository changes were introduced.
+
+## Configurable local ports
+
+Compose host ports now use `POSTGRES_PORT` (default 5432) and `SWAGGER_PORT`
+(default 8081). Spring's default datasource URL and Swagger CORS origin use the
+same exported variables, with `DATABASE_URL` retaining precedence. Documentation
+explains exporting variables for both Compose and Maven. An HTTP integration test
+checks Swagger preflight access with a non-default port; container-internal ports
+and the OpenAPI application's port remain unchanged.
+
+Validation passed: `mvn clean verify` ran all 55 tests successfully, IntelliJ's
+build succeeded, and `docker compose config` resolved both default and custom ports.

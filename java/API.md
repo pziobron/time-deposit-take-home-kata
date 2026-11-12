@@ -41,9 +41,26 @@ no deposits. In a second terminal, optionally load demo records from `java/`:
 docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -U time_deposits -d time_deposits < demo-data.sql
 ```
 
-The application defaults to port 8080 and database port 5432. Database connection
-settings can be overridden with `DATABASE_URL`, `DATABASE_USERNAME`, and
-`DATABASE_PASSWORD`. Compose credentials are for local development.
+The application defaults to port 8080, PostgreSQL to host port 5432, and Swagger
+UI to host port 8081. To avoid conflicts, export alternative ports in the same
+terminal before starting both Compose and the application:
+
+```sh
+export POSTGRES_PORT=5433
+export SWAGGER_PORT=8082
+docker compose up -d --wait
+mvn spring-boot:run
+```
+
+Then open <http://localhost:8082>. The application automatically uses PostgreSQL
+port 5433 and allows the Swagger browser origin on port 8082. Its own HTTP port
+remains 8080, matching the OpenAPI server URL. Container-internal ports do not change.
+
+Database connection settings can also be overridden with `DATABASE_URL`,
+`DATABASE_USERNAME`, and `DATABASE_PASSWORD`. An explicit `DATABASE_URL` takes
+precedence over `POSTGRES_PORT`. Compose credentials are for local development.
+Export the same variables in other terminals that run Compose commands. A Compose
+`.env` file alone does not export variables to a separately launched Maven process.
 
 To run the packaged application instead:
 
@@ -63,7 +80,8 @@ out**, then **Execute**. The server URL is `http://localhost:8080`.
 3. Execute GET again to inspect the updated balances.
 
 Swagger UI runs separately from the application, which defines exactly the two
-business operations. Browser access is allowed from `http://localhost:8081`.
+business operations. Browser access is allowed from `http://localhost:8081` by
+default, or the localhost origin using your exported `SWAGGER_PORT`.
 The same operations can be called from a terminal:
 
 ```sh

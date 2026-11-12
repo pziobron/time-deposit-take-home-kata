@@ -3,6 +3,7 @@ package org.ikigaidigital.configuration;
 import org.ikigaidigital.TimeDepositCalculator;
 import org.ikigaidigital.application.port.TimeDepositRepository;
 import org.ikigaidigital.application.service.TimeDepositService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -17,12 +18,12 @@ public class ApplicationConfiguration {
     }
 
     @Bean
-    WebMvcConfigurer swaggerCorsConfiguration() {
+    WebMvcConfigurer swaggerCorsConfiguration(@Value("${app.swagger-origin}") String swaggerOrigin) {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/time-deposits/**")
-                    .allowedOrigins("http://localhost:8081")
+                    .allowedOrigins(swaggerOrigin)
                     .allowedMethods("GET", "POST");
             }
         };
