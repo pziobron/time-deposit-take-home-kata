@@ -70,3 +70,9 @@ A junior developer implemented domain logic for a time deposit system but did no
 ### Submission Instructions
 - Provide clear instructions on how to trigger the endpoints using the Swagger contract.
 - Email the link to your public GitHub repository.
+
+## Java solution
+
+See [Java API and running instructions](java/API.md) for local PostgreSQL and
+Swagger UI setup, demo data, endpoint usage, and verification commands.
+See [AI-assisted development](AI_USAGE.md) for the tools and workflow used.

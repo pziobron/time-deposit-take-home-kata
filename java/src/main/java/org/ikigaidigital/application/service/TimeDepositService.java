@@ -5,6 +5,7 @@ import org.ikigaidigital.application.model.TimeDepositDetails;
 import org.ikigaidigital.TimeDeposit;
 import org.ikigaidigital.TimeDepositCalculator;
 import org.ikigaidigital.application.port.TimeDepositRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,19 +20,21 @@ public class TimeDepositService {
         this.calculator = calculator;
     }
 
+    @Transactional(readOnly = true)
     public List<TimeDepositDetails> getTimeDeposits() {
         return repository.findAll();
     }
 
     /**
      * Applies and saves one interest update for every deposit.
-     * The infrastructure integration must wrap the entire read-calculate-save
-     * operation in a transaction, not just the save.
+     * The transaction covers the entire read-calculate-save operation so locks
+     * are held until all balances are saved, with rollback on failure.
      */
+    @Transactional
     public void updateBalances() {
         // Keep decimal balances for retrieval, converting only at the boundary
         // of the shared calculator, whose Double contract must remain unchanged.
-        List<TimeDeposit> deposits = repository.findAll().stream()
+        List<TimeDeposit> deposits = repository.findAllForBalanceUpdate().stream()
             .map(deposit -> new TimeDeposit(deposit.id(), deposit.planType(),
                 deposit.balance().doubleValue(), deposit.days()))
             .toList();

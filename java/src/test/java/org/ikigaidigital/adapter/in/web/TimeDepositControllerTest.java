@@ -2,6 +2,7 @@ package org.ikigaidigital.adapter.in.web;
 
 import org.ikigaidigital.TimeDepositCalculator;
 import org.ikigaidigital.application.model.BalanceUpdate;
+import org.ikigaidigital.application.model.InterestCalculationInput;
 import org.ikigaidigital.application.model.TimeDepositDetails;
 import org.ikigaidigital.application.model.Withdrawal;
 import org.ikigaidigital.application.port.TimeDepositRepository;
@@ -110,6 +111,14 @@ class TimeDepositControllerTest {
         @Override
         public List<TimeDepositDetails> findAll() {
             return List.copyOf(deposits);
+        }
+
+        @Override
+        public List<InterestCalculationInput> findAllForBalanceUpdate() {
+            return deposits.stream()
+                .map(deposit -> new InterestCalculationInput(deposit.id(), deposit.planType(),
+                    deposit.balance(), deposit.days()))
+                .toList();
         }
 
         @Override

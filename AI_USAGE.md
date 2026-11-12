@@ -55,6 +55,18 @@ mvn test
 - Explanation and review of binary floating-point rounding, including why changing
   the monetary arithmetic could violate the requirement to preserve behavior.
 - Drafting of this documentation.
+- PostgreSQL persistence and production wiring: Spring Data JDBC repositories,
+  separate mapped entity records, Flyway migration, balance-only writes, and a
+  narrow calculation-input read. Ordered row locks protect concurrent updates.
+- Application-owned `@Transactional` boundaries, replacing the initial
+  infrastructure transaction wrapper at the candidate's request. Retrieval uses
+  two bulk repository queries; each balance write uses an explicit update query
+  rather than an aggregate save, protecting metadata and withdrawal history.
+- Eight PostgreSQL Testcontainers integration tests covering retrieval,
+  decimal values, balance-only writes, empty storage, live HTTP updates, repeated
+  updates, rollback after earlier writes, and waiting for locked rows before calculation.
+- Docker Compose setup for PostgreSQL and a separate Swagger UI loading the
+  checked-in contract; optional demo SQL and local startup instructions.
 - Test-first implementation of the two HTTP operations using a thin Spring MVC
   controller. Four MockMvc tests use a real application service and calculator
   with a test-only repository, verifying JSON fields, date/number formatting,
@@ -114,3 +126,31 @@ mvn clean verify
 Open `java/target/site/jacoco/index.html` from the repository root to view the
 report. Generated reports remain under the ignored `target/` directory.
 This document should be updated as further development is completed.
+
+## Persistence verification
+
+The persistence step uses Spring Data JDBC, PostgreSQL JDBC, Flyway (including the
+PostgreSQL module), and Testcontainers. Versions are managed by the existing
+Spring Boot parent. Maven Failsafe runs `*IT` integration tests during `verify`;
+`mvn test` still runs the 46 calculator/application/MVC tests without Docker.
+No production in-memory database or repository is used.
+
+After switching to Spring Data JDBC and annotation-based transactions,
+`mvn clean verify` passed 54 tests (46 existing tests and eight PostgreSQL
+integration tests), with no failures or skips. JaCoCo recorded 94/96 production
+lines and 14/14 branches covered. The two uncovered lines are the main startup
+method; executable JAR startup was checked separately with the initial JDBC adapter.
+
+Manual smoke checks started the Compose services and executable JAR, loaded demo
+records, issued GET and POST requests, and verified saved balances and unchanged
+withdrawals. Swagger UI and its served contract returned HTTP 200, the served YAML
+matched the source file, and GET/POST browser-origin CORS checks passed. A browser
+UI click-through was not performed. Services started for these checks were stopped;
+the local database volume is retained.
+
+The API's annual-rate interpretation, eligibility, and floating-point rounding
+remain unchanged. Transactions now use `@Transactional` in the application service;
+Spring Data mapping and query annotations stay inside the persistence adapter.
+The calculator and shared model have no Spring annotations. The current adapter
+issues one SQL update per deposit rather than batching; this is an explicit
+simplicity tradeoff, not a measured performance improvement.

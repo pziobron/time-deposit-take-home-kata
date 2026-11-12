@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/time_deposits}
+    username: ${DATABASE_USERNAME:time_deposits}
+    password: ${DATABASE_PASSWORD:time_deposits}
