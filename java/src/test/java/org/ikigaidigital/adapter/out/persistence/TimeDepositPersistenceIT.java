@@ -13,10 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -25,15 +25,17 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.List;
+import javax.sql.DataSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Testcontainers
 @SpringBootTest(classes = TimeDepositApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -49,6 +51,8 @@ class TimeDepositPersistenceIT {
         registry.add("spring.datasource.password", postgres::getPassword);
     }
 
+    @Autowired
+    private DataSource dataSource;
     @Autowired
     private JdbcTemplate jdbc;
     @Autowired
@@ -139,12 +143,15 @@ class TimeDepositPersistenceIT {
 
         assertThat(update.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).extracting(TimeDepositDetails::balance)
+        TimeDepositDetails[] deposits = response.getBody();
+        assertNotNull(deposits, "GET /time-deposits must return a response body");
+        assertThat(deposits).hasSize(5);
+        assertThat(deposits).extracting(TimeDepositDetails::balance)
             .containsExactly(new BigDecimal("1201.123"), new BigDecimal("1203.0"),
                 new BigDecimal("1205.0"), new BigDecimal("1200.0"), new BigDecimal("1200.0"));
-        assertThat(response.getBody()[0].withdrawals()).containsExactly(
+        assertThat(deposits[0].withdrawals()).containsExactly(
             new Withdrawal(7, 1, new BigDecimal("50.25"), LocalDate.of(2026, 11, 1)));
-        assertThat(response.getBody()).extracting(TimeDepositDetails::days).containsExactly(31, 365, 46, 45, 46);
+        assertThat(deposits).extracting(TimeDepositDetails::days).containsExactly(31, 365, 46, 45, 46);
     }
 
     @Test
@@ -169,7 +176,7 @@ class TimeDepositPersistenceIT {
     void updateWaitsForLockedRowsAndUsesTheNewlyCommittedBalance() throws Exception {
         insertDeposit(1, "student", "1200.0", 31);
         var executor = Executors.newSingleThreadExecutor();
-        try (var connection = jdbc.getDataSource().getConnection()) {
+        try (var connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
             try (var statement = connection.createStatement()) {
                 statement.executeQuery("SELECT id FROM \"timeDeposits\" WHERE id = 1 FOR UPDATE").close();
@@ -177,11 +184,11 @@ class TimeDepositPersistenceIT {
 
                 // Wait for an actual database lock wait, rather than relying on
                 // a sleep or thread scheduling to manufacture concurrent reads.
-                await().atMost(Duration.ofSeconds(10)).until(() -> jdbc.queryForObject("""
+                await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> assertThat(jdbc.queryForObject("""
                     SELECT COUNT(*) FROM pg_stat_activity
                     WHERE datname = current_database() AND wait_event_type = 'Lock'
                       AND query LIKE '%ORDER BY id FOR UPDATE%'
-                    """, Integer.class) > 0);
+                    """, Integer.class)).isPositive());
 
                 statement.executeUpdate("UPDATE \"timeDeposits\" SET balance = 1203.0 WHERE id = 1");
                 connection.commit();

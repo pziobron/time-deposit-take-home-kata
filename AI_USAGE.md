@@ -179,3 +179,12 @@ and the OpenAPI application's port remain unchanged.
 
 Validation passed: `mvn clean verify` ran all 55 tests successfully, IntelliJ's
 build succeeded, and `docker compose config` resolved both default and custom ports.
+
+## Inspection cleanup
+
+IntelliJ inspections prompted a matching non-null annotation on the CORS callback,
+an explicit response-body assertion before array access, direct injection of the
+test datasource, and assertion-based polling to avoid nullable count unboxing.
+All 55 tests and the IntelliJ build pass. Reinspection of the edited Java files
+reports only IDE SQL datasource-configuration notices; shared-model style
+suggestions were intentionally left unchanged. No inspection suppressions were added.
