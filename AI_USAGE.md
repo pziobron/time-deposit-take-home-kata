@@ -10,6 +10,9 @@ has been introduced at this stage.
 
 The Java module targets Java 17 and uses Maven, JUnit 5, and AssertJ. The initial
 test suite was run locally with OpenJDK 25.0.1 and Maven 3.9.9.
+The HTTP step adds Spring Boot 3.5.16 web and test starters. Its parent manages
+dependency and Maven plugin versions, replacing the individually pinned test
+libraries and older compiler/test plugin versions. Java compilation still targets 17.
 
 ## Workflow and task instructions
 
@@ -52,6 +55,10 @@ mvn test
 - Explanation and review of binary floating-point rounding, including why changing
   the monetary arithmetic could violate the requirement to preserve behavior.
 - Drafting of this documentation.
+- Test-first implementation of the two HTTP operations using a thin Spring MVC
+  controller. Four MockMvc tests use a real application service and calculator
+  with a test-only repository, verifying JSON fields, date/number formatting,
+  empty arrays, and a POST followed by a GET showing the persisted balance change.
 - Test-first implementation of application use cases for retrieval and balance
   updates, a repository port, and immutable deposit/withdrawal snapshots. Five
   service tests use a test-only in-memory repository with explicit saving and the
@@ -88,9 +95,14 @@ itself; expected outcomes and boundary cases were reviewed separately.
 
 After application implementation, `mvn clean verify` passed all 42 tests (37
 calculator and five application tests). HTTP adapters, database persistence, and
-transaction integration are still to be implemented. The application service
+transaction integration were still to be implemented at that point. The application service
 documents that its full read-calculate-save operation must run in one transaction
 when infrastructure is wired.
+
+After HTTP implementation, `mvn clean verify` passed all 46 tests with 100% line
+coverage (62/62) and branch coverage (12/12). These tests exercise the MVC layer
+in a Spring test context, not a live network server. Database persistence,
+production bean/startup configuration, and transactions remain for the next step.
 
 To regenerate the coverage report from the repository root:
 

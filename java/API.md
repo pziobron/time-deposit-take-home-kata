@@ -26,8 +26,10 @@ existing behavior rather than introduce a new rounding rule.
 
 ## Trying the contract
 
-The server is not implemented yet. The commands below describe the intended
-interface once the application is running locally on port 8080:
+The HTTP controller is implemented and tested with Spring MVC's MockMvc, the real
+application service, and a test-only in-memory repository. Production startup,
+database persistence, and transaction wiring are not implemented yet. The commands
+below describe usage once the application is running locally on port 8080:
 
 ```sh
 curl http://localhost:8080/time-deposits
