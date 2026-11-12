@@ -159,3 +159,11 @@ Spring Data mapping and query annotations stay inside the persistence adapter.
 The calculator and shared model have no Spring annotations. The current adapter
 issues one SQL update per deposit rather than batching; this is an explicit
 simplicity tradeoff, not a measured performance improvement.
+
+## Shared test support
+
+The duplicate in-memory repositories in application and MVC tests were extracted
+into `org.ikigaidigital.support.InMemoryTimeDepositRepository` under test sources.
+Both suites use its fixture setup/reset methods and immutable snapshots. It does
+not simulate locking or transactions; PostgreSQL Testcontainers tests retain that
+responsibility. No H2 dependency or production repository changes were introduced.

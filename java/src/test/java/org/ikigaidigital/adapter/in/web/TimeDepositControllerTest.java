@@ -1,11 +1,9 @@
 package org.ikigaidigital.adapter.in.web;
 
 import org.ikigaidigital.TimeDepositCalculator;
-import org.ikigaidigital.application.model.BalanceUpdate;
-import org.ikigaidigital.application.model.InterestCalculationInput;
+import org.ikigaidigital.support.InMemoryTimeDepositRepository;
 import org.ikigaidigital.application.model.TimeDepositDetails;
 import org.ikigaidigital.application.model.Withdrawal;
-import org.ikigaidigital.application.port.TimeDepositRepository;
 import org.ikigaidigital.application.service.TimeDepositService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -39,7 +36,7 @@ class TimeDepositControllerTest {
 
     @BeforeEach
     void setUp() {
-        repository.deposits.clear();
+        repository.clear();
     }
 
     @TestConfiguration(proxyBeanMethods = false)
@@ -57,9 +54,9 @@ class TimeDepositControllerTest {
 
     @Test
     void getReturnsDepositFieldsAndWithdrawalHistoryAsJson() throws Exception {
-        repository.deposits.add(new TimeDepositDetails(1, "basic", new BigDecimal("1200.123"), 31,
+        repository.add(new TimeDepositDetails(1, "basic", new BigDecimal("1200.123"), 31,
             List.of(new Withdrawal(7, 1, new BigDecimal("50.25"), LocalDate.of(2026, 11, 1)))));
-        repository.deposits.add(new TimeDepositDetails(2, "student", new BigDecimal("100.01"), 365, List.of()));
+        repository.add(new TimeDepositDetails(2, "student", new BigDecimal("100.01"), 365, List.of()));
 
         mvc.perform(get("/time-deposits"))
             .andExpect(status().isOk())
@@ -83,7 +80,7 @@ class TimeDepositControllerTest {
 
     @Test
     void postReturnsNoContentAndGetShowsUpdatedBalances() throws Exception {
-        repository.deposits.add(new TimeDepositDetails(1, "basic", new BigDecimal("1200.123"), 31,
+        repository.add(new TimeDepositDetails(1, "basic", new BigDecimal("1200.123"), 31,
             List.of(new Withdrawal(7, 1, new BigDecimal("50.25"), LocalDate.of(2026, 11, 1)))));
 
         mvc.perform(post("/time-deposits/update-balances"))
@@ -103,32 +100,5 @@ class TimeDepositControllerTest {
         mvc.perform(post("/time-deposits/update-balances"))
             .andExpect(status().isNoContent())
             .andExpect(content().string(""));
-    }
-
-    private static class InMemoryTimeDepositRepository implements TimeDepositRepository {
-        private final List<TimeDepositDetails> deposits = new ArrayList<>();
-
-        @Override
-        public List<TimeDepositDetails> findAll() {
-            return List.copyOf(deposits);
-        }
-
-        @Override
-        public List<InterestCalculationInput> findAllForBalanceUpdate() {
-            return deposits.stream()
-                .map(deposit -> new InterestCalculationInput(deposit.id(), deposit.planType(),
-                    deposit.balance(), deposit.days()))
-                .toList();
-        }
-
-        @Override
-        public void saveBalances(List<BalanceUpdate> updates) {
-            for (BalanceUpdate update : updates) {
-                deposits.replaceAll(existing -> existing.id() == update.id()
-                    ? new TimeDepositDetails(existing.id(), existing.planType(), update.balance(),
-                        existing.days(), existing.withdrawals())
-                    : existing);
-            }
-        }
     }
 }
