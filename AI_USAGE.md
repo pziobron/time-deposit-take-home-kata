@@ -197,3 +197,39 @@ existing calculator. `TimeDeposit` and `TimeDepositCalculator` retain their orig
 fully qualified names and contracts. `TimeDepositApplication` remains in the root
 package so Spring's default component and repository scanning covers the adapters
 and configuration below it. Calculation rules and arithmetic are unchanged.
+
+## Dependency security updates
+
+AI assistance reviewed OSV matches against the resolved Maven dependencies and
+applied compatible version overrides for Tomcat, the Jackson BOM, PostgreSQL JDBC,
+the Log4j BOM, and test-transitive Commons Compress. A rescan detected a Commons
+Lang advisory introduced transitively by the newer Compress; its version was
+patched too. Both the first upgrade and final upgrade passed the full test suite.
+
+The final OSV query checked all 94 resolved package/version pairs and returned
+only two Spring MVC advisory records, down from 24 records in the 90-package
+baseline. Both remaining findings require view features absent from the current
+REST application. No suppressions or Spring Boot major migration were made.
+[Security notes](java/SECURITY.md) preserve the versions, remaining findings,
+upstream references, and limits. OWASP Dependency-Check had previously failed to
+initialize NVD data without an API key; it was not reported as a successful scan.
+Final validation: all 55 tests pass with `mvn clean verify`, and IntelliJ builds
+successfully.
+
+## Mend advisory follow-up
+
+The candidate supplied additional IntelliJ/Mend warnings not returned by OSV's
+Maven-coordinate matching. Upstream release notes and CVE Program records were
+reviewed. Logback classic/core, Commons Codec, JSON Smart/Accessors Smart, and
+ASM were updated to fixed available versions. The unmaintained Android JSON test
+parser, which has no patched release, was replaced with maintained `org.json` in
+test scope; existing JSONassert tests remain intact.
+
+All 55 tests pass, IntelliJ builds successfully, and the resolved dependency tree
+and executable JAR were checked. A fresh IntelliJ POM inspection shows only the
+13 distinct Spring Framework CVEs supplied by the candidate; no non-Spring
+warnings from that list remain. The OSV rescan still reports two MVC records;
+this narrower OSV count is explicitly not presented as a complete Mend result.
+`java/SECURITY.md` records every remaining Spring advisory's prerequisites and
+why they were not found in current application features. No suppressions or
+Spring Boot major-version migration were introduced.

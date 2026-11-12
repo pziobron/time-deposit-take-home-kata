@@ -76,3 +76,6 @@ A junior developer implemented domain logic for a time deposit system but did no
 See [Java API and running instructions](java/API.md) for local PostgreSQL and
 Swagger UI setup, demo data, endpoint usage, and verification commands.
 See [AI-assisted development](AI_USAGE.md) for the tools and workflow used.
+
+See [Dependency security review](java/SECURITY.md) for patched dependencies,
+remaining advisory applicability, and scan limitations.
