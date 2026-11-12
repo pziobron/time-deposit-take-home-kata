@@ -240,3 +240,13 @@ At the candidate's request, `TimeDeposit` now uses Lombok `@Getter`,
 `@AllArgsConstructor`, and a field-level `@Setter` on balance. Its original package,
 constructor parameter types/order, getter signatures, and balance setter remain
 unchanged. No additional setters, equality methods, or null validation were added.
+
+## Unused Mockito removal
+
+The tests do not use Mockito; Spring Boot's test starter previously introduced it
+transitively and its inline mock maker attached a Java agent during test startup.
+Mockito core and its JUnit integration are now excluded from that starter. No
+warning-suppression flags or extra agents were added. All 55 tests and the IntelliJ
+build pass, the resolved tree contains no Mockito or Byte Buddy agent, and the
+Mockito self-attachment/dynamic-agent/CDS warnings are absent from the Maven run.
+Unrelated Maven/JDK Unsafe deprecation warnings are outside this change.

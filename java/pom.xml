@@ -90,6 +90,15 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
             <exclusions>
+                <!-- Tests use real collaborators and an in-memory fake, not Mockito. -->
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.mockito</groupId>
+                    <artifactId>mockito-junit-jupiter</artifactId>
+                </exclusion>
                 <!-- Unmaintained parser has no patched release; JSONassert uses org.json instead. -->
                 <exclusion>
                     <groupId>com.vaadin.external.google</groupId>
