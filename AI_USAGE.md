@@ -54,12 +54,13 @@ mvn test
 - Drafting of this documentation.
 - Documentation of calculator assumptions in code comments: annual rates divided
   by 12 and one update per invocation, without scheduling or advancing days.
+- Initial calculator refactoring: for-each iteration, extraction of interest
+  calculation, and guard clauses, preserving arithmetic and rounding.
 
 AI assistance supported test design and implementation before refactoring. The
 candidate reviewed the cases interactively, questioned expected values and
 redundancy, and discussed the behavior each test protects.
 
-At this stage, production changes are limited to comments; calculator logic is
-unchanged. The latest test run passed all 37
-tests. No coverage measurement has been performed yet. This document should be
+The calculator has undergone an initial structural refactor without intentional
+behavior changes. The latest test run passed all 37 tests. No coverage measurement has been performed yet. This document should be
 updated as further development is completed.
