@@ -56,11 +56,15 @@ mvn test
   by 12 and one update per invocation, without scheduling or advancing days.
 - Initial calculator refactoring: for-each iteration, extraction of interest
   calculation, and guard clauses, preserving arithmetic and rounding.
+- Extraction of basic, student, and premium interest policies, selected by a map
+    of existing plan names. Eligibility and rates belong to policies; rounding and
+    balance updates remain in the calculator. Unknown plans still earn no interest.
 
-AI assistance supported test design and implementation before refactoring. The
+AI assistance supported test design, implementation, and calculator refactoring. The
 candidate reviewed the cases interactively, questioned expected values and
 redundancy, and discussed the behavior each test protects.
 
-The calculator has undergone an initial structural refactor without intentional
-behavior changes. The latest test run passed all 37 tests. No coverage measurement has been performed yet. This document should be
+The calculator now delegates interest calculation to plan-specific policies without
+intentional behavior changes for valid inputs. The latest test run passed all 37
+tests. No coverage measurement has been performed yet. This document should be
 updated as further development is completed.

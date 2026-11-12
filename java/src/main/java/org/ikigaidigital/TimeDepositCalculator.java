@@ -3,9 +3,15 @@ package org.ikigaidigital;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 
 /** Updates deposit balances using plan-specific interest policies and rounding to two decimal places. */
 public class TimeDepositCalculator {
+    private final Map<String, InterestPolicy> interestPolicies = Map.of(
+        "basic", new BasicInterestPolicy(),
+        "student", new StudentInterestPolicy(),
+        "premium", new PremiumInterestPolicy()
+    );
 
     /**
      * Applies one month's interest to each eligible deposit using its current balance and days.
@@ -29,19 +35,7 @@ public class TimeDepositCalculator {
     }
 
     private double calculateInterest(TimeDeposit deposit) {
-        if (deposit.getDays() <= 30) {
-            return 0;
-        }
-
-        if (deposit.getPlanType().equals("student") && deposit.getDays() < 366) {
-            return deposit.getBalance() * 0.03 / 12;
-        }
-        if (deposit.getPlanType().equals("premium") && deposit.getDays() > 45) {
-            return deposit.getBalance() * 0.05 / 12;
-        }
-        if (deposit.getPlanType().equals("basic")) {
-            return deposit.getBalance() * 0.01 / 12;
-        }
-        return 0;
+        InterestPolicy policy = interestPolicies.get(deposit.getPlanType());
+        return policy == null ? 0 : policy.calculateInterest(deposit);
     }
 }
