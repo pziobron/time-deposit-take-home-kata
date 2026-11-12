@@ -52,6 +52,11 @@ mvn test
 - Explanation and review of binary floating-point rounding, including why changing
   the monetary arithmetic could violate the requirement to preserve behavior.
 - Drafting of this documentation.
+- Definition of the two-operation OpenAPI contract and API assumptions before
+  implementation, including response schemas, examples, update semantics, and
+  withdrawal representation. Contract validation used
+  `npx --yes --package @apidevtools/swagger-cli@4.0.4 swagger-cli validate java/src/main/resources/openapi.yaml`
+  from the repository root and passed. No application dependencies were added.
 - Addition of JaCoCo reporting and review of line and branch coverage.
 - Documentation of calculator assumptions in code comments: annual rates divided
   by 12 and one update per invocation, without scheduling or advancing days.

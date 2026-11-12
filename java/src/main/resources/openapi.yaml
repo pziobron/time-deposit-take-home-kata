@@ -1,0 +1,116 @@
+openapi: 3.0.3
+info:
+  title: Time Deposit API
+  version: 1.0.0
+  description: Retrieves time deposits and applies monthly interest updates.
+servers:
+  - url: http://localhost:8080
+    description: Local development
+paths:
+  /time-deposits:
+    get:
+      operationId: getTimeDeposits
+      summary: Retrieve all time deposits with their withdrawals
+      description: |
+        Returns an empty array when no deposits exist. Each deposit includes an
+        empty withdrawals array when it has no withdrawals. Ordering is unspecified.
+      responses:
+        '200':
+          description: All stored time deposits.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimeDeposit'
+              examples:
+                deposits:
+                  summary: A deposit with a recorded withdrawal
+                  value:
+                    - id: 1
+                      planType: basic
+                      balance: 1200.123
+                      days: 31
+                      withdrawals:
+                        - id: 1
+                          timeDepositId: 1
+                          amount: 50.25
+                          date: '2026-11-01'
+                noDeposits:
+                  summary: No deposits stored
+                  value: []
+  /time-deposits/update-balances:
+    post:
+      operationId: updateTimeDepositBalances
+      summary: Apply one monthly interest update to all time deposits
+      # Assumption: each request triggers one update; no calendar scheduling or
+      # duplicate-request protection is specified by the assignment.
+      description: |
+        Updates all stored deposit balances in one transaction. Each successful
+        request applies one calculation to the current balances, so repeated
+        requests can compound interest. Days and withdrawals remain unchanged.
+        No request body is needed. An empty database is also a successful update.
+
+        Rates are interpreted as annual rates divided by 12, matching the existing
+        calculator: basic 1%, student 3%, premium 5%. All plans earn no interest
+        through day 30. Student earns interest only through day 365; premium starts
+        on day 46. Unknown plan types earn no interest.
+
+        Only the calculated interest is rounded to two decimal places using the
+        existing calculator's binary floating-point arithmetic and HALF_UP rounding.
+        The resulting total balance is not rounded again.
+      responses:
+        '204':
+          description: All balance updates have been saved. No response body.
+components:
+  schemas:
+    TimeDeposit:
+      type: object
+      required: [id, planType, balance, days, withdrawals]
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        planType:
+          type: string
+          description: Case-sensitive plan name. Existing plans are basic, student, and premium.
+          example: basic
+        balance:
+          type: number
+          description: Current balance; not restricted to two decimal places.
+          example: 1200.123
+        days:
+          type: integer
+          format: int32
+          description: Deposit age in days, supplied to the interest calculator unchanged.
+          example: 31
+        withdrawals:
+          type: array
+          items:
+            $ref: '#/components/schemas/Withdrawal'
+    Withdrawal:
+      # Assumption: expose the withdrawal fields listed in the database requirements.
+      # Withdrawals are historical records; no rule for deducting them during an
+      # interest update is specified, so they do not alter the calculation.
+      type: object
+      required: [id, timeDepositId, amount, date]
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        timeDepositId:
+          type: integer
+          format: int32
+          description: ID of the deposit that owns this withdrawal.
+          example: 1
+        amount:
+          type: number
+          description: Recorded withdrawal amount.
+          example: 50.25
+        date:
+          type: string
+          format: date
+          description: Calendar date of the withdrawal, without a time or time zone.
+          example: '2026-11-01'
