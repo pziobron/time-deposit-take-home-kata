@@ -1,34 +1,16 @@
 package org.ikigaidigital;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
 /** Represents a time deposit with its plan type, current balance, and age in days. */
+@Getter
+@AllArgsConstructor
 public class TimeDeposit {
     private int id;
     private String planType;
+    @Setter
     private Double balance;
     private int days;
-
-    public TimeDeposit(int id, String planType, Double balance, int days) {
-        this.id = id;
-        this.planType = planType;
-        this.balance = balance;
-        this.days = days;
-    }
-
-    public int getId() { return id; }
-
-    public String getPlanType() {
-        return planType;
-    }
-
-    public Double getBalance() {
-        return balance;
-    }
-
-    public int getDays() {
-        return days;
-    }
-
-    public void setBalance(Double balance) {
-        this.balance = balance;
-    }
 }

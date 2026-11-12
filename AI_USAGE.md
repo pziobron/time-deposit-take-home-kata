@@ -233,3 +233,10 @@ this narrower OSV count is explicitly not presented as a complete Mend result.
 `java/SECURITY.md` records every remaining Spring advisory's prerequisites and
 why they were not found in current application features. No suppressions or
 Spring Boot major-version migration were introduced.
+
+## Shared model boilerplate
+
+At the candidate's request, `TimeDeposit` now uses Lombok `@Getter`,
+`@AllArgsConstructor`, and a field-level `@Setter` on balance. Its original package,
+constructor parameter types/order, getter signatures, and balance setter remain
+unchanged. No additional setters, equality methods, or null validation were added.
