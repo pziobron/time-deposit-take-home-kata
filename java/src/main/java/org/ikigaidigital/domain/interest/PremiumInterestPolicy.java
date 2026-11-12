@@ -1,7 +1,9 @@
-package org.ikigaidigital;
+package org.ikigaidigital.domain.interest;
+
+import org.ikigaidigital.TimeDeposit;
 
 /** Applies a 5% annual rate, divided by 12, after the first 45 days. */
-final class PremiumInterestPolicy implements InterestPolicy {
+public final class PremiumInterestPolicy implements InterestPolicy {
     @Override
     public double calculateInterest(TimeDeposit deposit) {
         if (deposit.getDays() <= 45) {

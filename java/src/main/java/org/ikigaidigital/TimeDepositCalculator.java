@@ -1,5 +1,10 @@
 package org.ikigaidigital;
 
+import org.ikigaidigital.domain.interest.BasicInterestPolicy;
+import org.ikigaidigital.domain.interest.InterestPolicy;
+import org.ikigaidigital.domain.interest.PremiumInterestPolicy;
+import org.ikigaidigital.domain.interest.StudentInterestPolicy;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;

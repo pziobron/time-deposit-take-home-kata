@@ -188,3 +188,12 @@ test datasource, and assertion-based polling to avoid nullable count unboxing.
 All 55 tests and the IntelliJ build pass. Reinspection of the edited Java files
 reports only IDE SQL datasource-configuration notices; shared-model style
 suggestions were intentionally left unchanged. No inspection suppressions were added.
+
+## Domain package organization
+
+Interest policy classes and their interface were moved to
+`org.ikigaidigital.domain.interest`, with public visibility for access by the
+existing calculator. `TimeDeposit` and `TimeDepositCalculator` retain their original
+fully qualified names and contracts. `TimeDepositApplication` remains in the root
+package so Spring's default component and repository scanning covers the adapters
+and configuration below it. Calculation rules and arithmetic are unchanged.
