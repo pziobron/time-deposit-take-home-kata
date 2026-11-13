@@ -31,11 +31,12 @@ can be reused with a coding agent against this repository:
    code and expected values with the candidate before proceeding to refactoring.
 
 These are a summary of the substantive task instructions used. Explanatory
-questions and the full conversation are omitted. No separate custom system prompt
-or agent configuration file has been created for this project. If either is added
-later, it should be included in the repository and referenced here. Equivalent
-instructions reproduce the workflow; generated code may vary between model
-versions and runs.
+questions and the full conversation are omitted. During final preparation,
+the established working rules were captured in the root [AGENTS.md](AGENTS.md)
+for future Codex sessions. That file was not present during the earlier work;
+the rules were previously supplied through conversation. No separate custom
+system prompt was created. Equivalent instructions reproduce the workflow;
+generated code may vary between model versions and runs.
 
 To run the checks from the repository root, with Java 17 or newer and Maven installed:
 
